@@ -127,6 +127,8 @@ Este projeto está licenciado sob a MIT License.
 ### 📚 Recursos Adicionais
 - Documentação NestJS
 
+- Coleção Postman: https://www.postman.com/igor-donatti/igor-donatti/collection/4y8kewu/auth-module
+
 - Documentação Prisma
 
 - JWT.io – Ferramenta para decodificar e validar tokens JWT
