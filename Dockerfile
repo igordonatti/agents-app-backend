@@ -1,24 +1,45 @@
-# Use Node.js 20.11.1 base image
-FROM node:20.11.1-alpine
+# Dockerfile
 
-# Set working directory
-WORKDIR /app
+# ---- Estágio 1: Build ----
+# Usamos uma imagem Node.js completa para instalar dependências e construir o projeto.
+FROM node:18-alpine AS builder
 
-# Copy package.json and package-lock.json
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /usr/src/app
+
+# Copia os arquivos de gerenciamento de pacotes
 COPY package*.json ./
 
-# Install dependencies
-RUN npm cache clean --force
-RUN npm install --legacy-peer-deps
+# Instala as dependências de produção
+RUN npm install
 
-# Copy the rest of the application code
+# Copia todo o código da aplicação
 COPY . .
 
-# Generate Prisma Client code
+# Gera o cliente Prisma
 RUN npx prisma generate
 
-# Expose the port the app runs on, here, I was using port 3333
+# Constrói a aplicação para produção
+RUN npm run build
+
+# ---- Estágio 2: Produção ----
+# Usamos uma imagem Node.js mais leve para a execução.
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+# Copia as dependências de produção do estágio de build
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+# Copia os artefatos da construção (a pasta 'dist')
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Copia o schema do Prisma para poder rodar migrações em produção
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/package*.json ./
+
+# Expõe a porta que sua aplicação NestJS usa (padrão é 3000)
 EXPOSE 3000
 
-# Command to run the app
-CMD [  "npm", "run", "start:migrate:prod" ]
+# Comando para iniciar a aplicação
+CMD ["node", "dist/main"]
