@@ -13,8 +13,7 @@ export class UserController {
 
   @isPublic()
   @Post()
-  createUser(@Body() user: { email: string; password: string }) {
-    console.log('teste');
-    return this.userService.createUser(user.email, user.password);
+  createUser(@Body() user: { email: string; password: string; name: string }) {
+    return this.userService.createUser(user.email, user.password, user.name);
   }
 }
