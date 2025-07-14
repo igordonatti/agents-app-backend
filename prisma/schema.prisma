@@ -29,9 +29,9 @@ model folders {
   id_folder      String           @unique
   id_tenant      BigInt
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
-  prompt         String?
-  ice_breakers   String[]
-  name           String?          @default("")
+  prompt         String?          @default("")
+  ice_breakers   String[]         @default([])
+  name           String
   documents_info documents_info[]
   tenant         tenants          @relation(fields: [id_tenant], references: [id], onDelete: Cascade)
 }
