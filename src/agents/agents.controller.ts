@@ -205,8 +205,11 @@ export class AgentsController {
     description: 'Agente não encontrado',
   })
   @Post('ice-breaker')
-  async createIceBreaker(@Body() data: CreateIceBreakerDto) {
-    return await this.agentsService.createIceBreaker(data);
+  async createIceBreaker(@Body() { text, id_agent }: CreateIceBreakerDto) {
+    return await this.agentsService.createIceBreaker({
+      text,
+      id_agent: Number(id_agent),
+    });
   }
 
   @ApiOperation({

@@ -12,11 +12,11 @@ export class CreateIceBreakerDto {
 
   @ApiProperty({
     description: 'ID do agente',
-    example: 1,
+    example: '1',
   })
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  id_agent: number;
+  id_agent: string;
 }
 
 export class UpdateIceBreakerDto {
