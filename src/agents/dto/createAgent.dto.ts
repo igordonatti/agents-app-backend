@@ -26,11 +26,11 @@ export class CreateAgentDto {
 
   @ApiProperty({
     description: 'ID do tenant ao qual o agente pertence',
-    example: 1,
+    example: '1',
   })
   @IsNotEmpty()
-  @IsInt()
-  id_tenant: number;
+  @IsString()
+  id_tenant: string;
 
   @ApiPropertyOptional({
     description: 'Prompt personalizado para o agente',
