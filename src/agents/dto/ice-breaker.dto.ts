@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsInt, Min, Max } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateIceBreakerDto {
@@ -27,15 +27,4 @@ export class UpdateIceBreakerDto {
   @IsString()
   @IsNotEmpty()
   text: string;
-
-  @ApiProperty({
-    description: 'Índice do quebra-gelo a ser atualizado (0-3)',
-    example: 0,
-    minimum: 0,
-    maximum: 3,
-  })
-  @IsInt()
-  @Min(0)
-  @Max(3)
-  index: number;
 }

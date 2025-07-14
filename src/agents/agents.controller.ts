@@ -217,6 +217,7 @@ export class AgentsController {
     description: 'Atualiza um quebra-gelo específico de um agente',
   })
   @ApiParam({ name: 'id', description: 'ID do agente' })
+  @ApiParam({ name: 'index', description: 'Índice do quebra-gelo (0-3)' })
   @ApiResponse({
     status: 200,
     description: 'Quebra-gelo atualizado com sucesso',
@@ -229,12 +230,13 @@ export class AgentsController {
     status: 404,
     description: 'Agente não encontrado',
   })
-  @Patch('ice-breaker/:id')
+  @Patch('ice-breaker/:id/:index')
   async updateIceBreaker(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdateIceBreakerDto,
+    @Param('index', ParseIntPipe) index: number,
+    @Body() { text }: UpdateIceBreakerDto,
   ) {
-    return await this.agentsService.updateIceBreaker(id, data);
+    return await this.agentsService.updateIceBreaker(id, index, text);
   }
 
   @ApiOperation({

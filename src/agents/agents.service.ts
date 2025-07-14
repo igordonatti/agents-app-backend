@@ -154,7 +154,7 @@ export class AgentsService {
     return convertBigIntToNumber(createdResponse);
   }
 
-  async updateIceBreaker(id: number, data: { text: string; index: number }) {
+  async updateIceBreaker(id: number, index: number, text: string) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -165,7 +165,7 @@ export class AgentsService {
       throw new NotFoundException('Agente não encontrado');
     }
 
-    if (data.index < 0 || data.index >= agent.ice_breakers.length) {
+    if (index < 0 || index >= agent.ice_breakers.length) {
       throw new BadRequestException('Índice inválido');
     }
 
@@ -176,7 +176,7 @@ export class AgentsService {
       data: {
         ice_breakers: {
           set: agent.ice_breakers.map((iceBreaker, index) =>
-            index === data.index ? data.text : iceBreaker,
+            index === index ? text : iceBreaker,
           ),
         },
       },
