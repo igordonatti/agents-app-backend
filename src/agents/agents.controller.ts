@@ -44,7 +44,7 @@ export class AgentsController {
   })
   @Get()
   async getAgents() {
-    const workflowPath = 'dev/agents';
+    const workflowPath = 'agents';
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -63,7 +63,7 @@ export class AgentsController {
   })
   @Get(':id')
   async getAgentById(@Param('id') id: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/dev/agents/${id}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/agents/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -81,7 +81,7 @@ export class AgentsController {
   })
   @Post()
   async createAgent(@Body() agent: CreateAgentDto) {
-    const workflowPath = 'dev/agents';
+    const workflowPath = '/agents';
     return await this.n8nService.postResource(workflowPath, agent);
   }
 
@@ -96,7 +96,7 @@ export class AgentsController {
   })
   @Get('tenant/:id_tenant')
   async getAgentsByTenant(@Param('id_tenant') id_tenant: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/dev/agents/tenant/${id_tenant}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/agents/tenant/${id_tenant}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -120,7 +120,7 @@ export class AgentsController {
   @Delete(':id')
   async deleteAgent(@Param('id') id: string) {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
-    const workflowPath = 'dev/agents';
+    const workflowPath = '/agents';
     return await this.n8nService.deleteResource(workflowPath, {
       id_agent: id,
     });
@@ -149,7 +149,7 @@ export class AgentsController {
   async updateAgentPrompt(@Param('id') id: string, @Body() prompt: string) {
     if (!prompt) throw new BadRequestException('Prompt não pode ser vazio');
 
-    const workflowPath = 'dev/upload-prompt';
+    const workflowPath = '/upload-prompt';
     return await this.n8nService.postResource(workflowPath, {
       id_agent: id,
       prompt,
@@ -180,7 +180,7 @@ export class AgentsController {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
     if (!name) throw new BadRequestException('Nome não pode ser vazio');
 
-    const workflowPath = 'dev/agents';
+    const workflowPath = '/agents';
     return await this.n8nService.patchResource(workflowPath, {
       id_agent: id,
       name,
