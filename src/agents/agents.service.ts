@@ -19,7 +19,7 @@ export class AgentsService {
     });
     const tenantExists = await this.prisma.tenants.findFirst({
       where: {
-        id: data.id_tenant,
+        id: Number(data.id_tenant),
       },
     });
 
@@ -34,7 +34,7 @@ export class AgentsService {
         ice_breakers: data.ice_breakers || [],
         tenant: {
           connect: {
-            id: data.id_tenant,
+            id: Number(data.id_tenant),
           },
         },
       },
