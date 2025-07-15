@@ -8,6 +8,9 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFiles,
+  ConflictException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,7 +19,9 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { N8nService } from 'src/n8n/n8n.service';
 import { CreateAgentDto } from './dto/createAgent.dto';
 import {
@@ -24,6 +29,13 @@ import {
   UpdateIceBreakerDto,
 } from './dto/ice-breaker.dto';
 import { AgentsService } from './agents.service';
+
+interface MulterFile {
+  buffer: Buffer;
+  originalname: string;
+  mimetype: string;
+  size: number;
+}
 
 @ApiTags('Agents')
 @ApiBearerAuth('JWT-auth')
@@ -81,7 +93,7 @@ export class AgentsController {
   })
   @Post()
   async createAgent(@Body() agent: CreateAgentDto) {
-    const workflowPath = '/agents';
+    const workflowPath = 'agents';
     return await this.n8nService.postResource(workflowPath, agent);
   }
 
@@ -120,7 +132,7 @@ export class AgentsController {
   @Delete(':id')
   async deleteAgent(@Param('id') id: string) {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
-    const workflowPath = '/agents';
+    const workflowPath = 'agents';
     return await this.n8nService.deleteResource(workflowPath, {
       id_agent: id,
     });
@@ -149,7 +161,7 @@ export class AgentsController {
   async updateAgentPrompt(@Param('id') id: string, @Body() prompt: string) {
     if (!prompt) throw new BadRequestException('Prompt não pode ser vazio');
 
-    const workflowPath = '/upload-prompt';
+    const workflowPath = 'upload-prompt';
     return await this.n8nService.postResource(workflowPath, {
       id_agent: id,
       prompt,
@@ -180,7 +192,7 @@ export class AgentsController {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
     if (!name) throw new BadRequestException('Nome não pode ser vazio');
 
-    const workflowPath = '/agents';
+    const workflowPath = 'agents';
     return await this.n8nService.patchResource(workflowPath, {
       id_agent: id,
       name,
@@ -210,6 +222,92 @@ export class AgentsController {
       text,
       id_agent: Number(id_agent),
     });
+  }
+
+  @ApiOperation({
+    summary: 'Upload de arquivo para agente',
+    description: 'Envia um arquivo para o agente através do n8n',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'Arquivos a serem enviados',
+        },
+        agentId: {
+          type: 'string',
+          description: 'ID do agente',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Arquivo enviado com sucesso',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Arquivo não enviado ou inválido',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Arquivo já existe na base de conhecimento',
+  })
+  @Post('upload')
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      preservePath: true,
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+    }),
+  )
+  async uploadFile(
+    @UploadedFiles() files: MulterFile[],
+    @Body('agentId') agentId: string,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Arquivos não foram enviados');
+    }
+
+    if (!agentId) {
+      throw new BadRequestException('ID do agente é obrigatório');
+    }
+
+    const workflowPath = 'agents/doc';
+
+    const fileData = files.map((file) => ({
+      buffer: file.buffer,
+      originalname: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+      mimetype: file.mimetype,
+      size: file.size,
+    }));
+
+    const response = await this.n8nService.postFiles(
+      workflowPath,
+      fileData,
+      agentId,
+    );
+
+    // Verifica se o arquivo já existe
+    if (response && typeof response === 'object' && 'message' in response) {
+      const responseObj = response as { message: string };
+      if (responseObj.message === 'Arquivo já existe na base de conhecimento') {
+        throw new ConflictException(
+          'Arquivo já existe na base de conhecimento',
+        );
+      }
+    }
+
+    console.log(response);
+    return response;
   }
 
   @ApiOperation({
@@ -263,5 +361,67 @@ export class AgentsController {
     @Param('index', ParseIntPipe) index: number,
   ) {
     return await this.agentsService.deleteIceBreaker(id, index);
+  }
+
+  @ApiOperation({
+    summary: 'Buscar arquivos da base de conhecimento',
+    description:
+      'Retorna todos os arquivos da base de conhecimento de um agente',
+  })
+  @ApiParam({ name: 'id', description: 'ID do agente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de arquivos retornada com sucesso',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Agente não encontrado',
+  })
+  @Get('files/:id')
+  async getAgentFiles(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('ID do agente é obrigatório');
+    }
+
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/agents/file/${id}`;
+    return await this.n8nService.getResource(workflowPath);
+  }
+
+  @ApiOperation({
+    summary: 'Deletar arquivo da base de conhecimento',
+    description:
+      'Remove um arquivo específico da base de conhecimento de um agente',
+  })
+  @ApiParam({ name: 'agentId', description: 'ID do agente' })
+  @ApiParam({ name: 'fileId', description: 'ID do arquivo' })
+  @ApiResponse({
+    status: 200,
+    description: 'Arquivo deletado com sucesso',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'IDs inválidos',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Agente ou arquivo não encontrado',
+  })
+  @Delete('files/:agentId/:fileId')
+  async deleteAgentFile(
+    @Param('agentId') agentId: string,
+    @Param('fileId') fileId: string,
+  ) {
+    if (!agentId) {
+      throw new BadRequestException('ID do agente é obrigatório');
+    }
+    if (!fileId) {
+      throw new BadRequestException('ID do arquivo é obrigatório');
+    }
+
+    const workflowPath = `agents/doc`;
+    return await this.n8nService.deleteResource(workflowPath, {
+      id_agent: agentId,
+      id_file: fileId,
+    });
   }
 }

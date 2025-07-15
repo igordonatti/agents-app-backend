@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
+import * as FormData from 'form-data';
 
 @Injectable()
 export class N8nService {
@@ -151,6 +152,126 @@ export class N8nService {
         throw new Error(`Falha na comunicação com o n8n: ${error.message}`);
       }
       this.logger.error('Erro inesperado ao atualizar dados do webhook', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Envia um arquivo (POST) para o n8n usando FormData.
+   * @param workflowPath - O path específico do webhook.
+   * @param file - Buffer do arquivo.
+   * @param filename - Nome original do arquivo.
+   * @param additionalData - Dados adicionais a serem enviados junto com o arquivo.
+   * @returns Uma Promise com a resposta do workflow.
+   */
+  async postFile<T>(
+    workflowPath: string,
+    file: Buffer,
+    filename: string,
+    additionalData?: Record<string, any>,
+  ): Promise<T> {
+    const url = `${this.n8nBaseUrl}/${workflowPath}`;
+    this.logger.log(`Enviando arquivo (POST) para: ${url}`);
+
+    try {
+      const formData = new FormData();
+
+      // Adiciona o arquivo ao FormData
+      formData.append('files', file, filename);
+
+      // Adiciona dados adicionais se fornecidos
+      if (additionalData) {
+        Object.keys(additionalData).forEach((key) => {
+          formData.append(key, additionalData[key]);
+        });
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, formData, {
+          headers: {
+            'X-N8N-API-KEY': this.n8nApiKey,
+            Accept: 'application/json',
+            'Accept-Charset': 'utf-8',
+            ...formData.getHeaders(),
+          },
+        }),
+      );
+      this.logger.log(`Arquivo enviado com sucesso para ${workflowPath}`);
+      return response.data as T;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        this.logger.error(
+          `Falha ao enviar arquivo: ${error.message}`,
+          error.stack,
+        );
+        throw new Error(`Falha na comunicação com o n8n: ${error.message}`);
+      }
+      this.logger.error('Erro inesperado ao enviar arquivo', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Envia múltiplos arquivos (POST) para o n8n usando FormData.
+   * @param workflowPath - O path específico do webhook.
+   * @param files - Array com informações dos arquivos.
+   * @param agentId - ID do agente.
+   * @returns Uma Promise com a resposta do workflow.
+   */
+  async postFiles<T>(
+    workflowPath: string,
+    files: Array<{
+      buffer: Buffer;
+      originalname: string;
+      mimetype: string;
+      size: number;
+    }>,
+    agentId: string,
+  ): Promise<T> {
+    const url = `${this.n8nBaseUrl}/${workflowPath}`;
+    this.logger.log(`Enviando ${files.length} arquivo(s) (POST) para: ${url}`);
+
+    try {
+      const formData = new FormData();
+
+      // Adiciona cada arquivo ao FormData com nome codificado corretamente
+      files.forEach((file) => {
+        // Mantém o nome original com encoding UTF-8 correto
+        formData.append('files', file.buffer, {
+          filename: file.originalname,
+          contentType: file.mimetype,
+        });
+      });
+
+      // Adiciona o ID do agente
+      formData.append('agentId', agentId);
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, formData, {
+          headers: {
+            'X-N8N-API-KEY': this.n8nApiKey,
+            ...formData.getHeaders(),
+          },
+        }),
+      );
+      this.logger.log(
+        `${files.length} arquivo(s) enviado(s) com sucesso para ${workflowPath}`,
+      );
+      return response.data as T;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        this.logger.error(
+          `Falha ao enviar arquivos: ${error.message}`,
+          error.stack,
+        );
+        if (error.response.status === 403) {
+          return {
+            message: 'Arquivo já existe na base de conhecimento',
+          } as T;
+        }
+        throw new Error(`Falha na comunicação com o n8n: ${error.message}`);
+      }
+      this.logger.error('Erro inesperado ao enviar arquivos', error);
       throw error;
     }
   }

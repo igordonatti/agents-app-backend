@@ -34,7 +34,7 @@ export class TenantsController {
   })
   @Get()
   async getTenants() {
-    const workflowPath = '/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -71,7 +71,7 @@ export class TenantsController {
   })
   @Post()
   async createTenant(@Body() tenant: CreateTenantDto) {
-    const workflowPath = '/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.postResource(workflowPath, tenant);
   }
 
@@ -100,7 +100,7 @@ export class TenantsController {
   })
   @Patch(':id')
   async updateTenantName(@Param('id') id: string, @Body() name: string) {
-    const workflowPath = '/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.patchResource(workflowPath, {
       id_tenant: id,
       name,
