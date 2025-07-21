@@ -6,9 +6,12 @@ import { JwtStrategy } from './strategies/jwt.stategy';
 import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
 import { UserModule } from 'src/user/user.module';
 import { AuthService } from './auth.service';
+import { EmailModule } from 'src/email/email.module';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [
+    EmailModule,
     UserModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -16,7 +19,7 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, EmailService],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
