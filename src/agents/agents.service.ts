@@ -213,4 +213,27 @@ export class AgentsService {
 
     return convertBigIntToNumber(deletedResponse);
   }
+
+  async updateCanGenerateImage(id: number, canGenerateImage: boolean) {
+    const agent = await this.prisma.folders.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!agent) {
+      throw new NotFoundException('Agente não encontrado');
+    }
+
+    const updatedResponse = await this.prisma.folders.update({
+      where: {
+        id,
+      },
+      data: {
+        can_generate_image: canGenerateImage,
+      },
+    });
+
+    return convertBigIntToNumber(updatedResponse);
+  }
 }
