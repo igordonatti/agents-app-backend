@@ -1,19 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserPayload } from './models/UserPayload';
 import { UserToken } from './models/UserToken';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   login(user: User): UserToken {
@@ -58,5 +64,20 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Token Inválido');
     }
+  }
+
+  async forgotPassword(email: string) {
+    await this.userService.findByEmail(email);
+
+    await this.emailService.sendResetPasswordLink(email);
+  }
+
+  async resetPassword(token: string, password: string) {
+    const email = await this.emailService.decodeConfirmationToken(token);
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) throw new NotFoundException('User not found');
+    const response = await this.userService.updatePassword(email, password);
+    return response;
   }
 }

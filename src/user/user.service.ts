@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -14,7 +14,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return user;
@@ -45,6 +45,22 @@ export class UserService {
       ...user,
       password: undefined,
       message: 'User created successfully',
+    };
+  }
+
+  async updatePassword(email: string, password: string) {
+    const user = await this.prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        password: await bcrypt.hash(password, 10),
+      },
+    });
+
+    return {
+      ...user,
+      password: undefined,
     };
   }
 }

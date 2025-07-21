@@ -10,6 +10,7 @@ import { N8nModule } from './n8n/n8n.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { AgentsModule } from './agents/agents.module';
 import { KnowledgeBaseModule } from './knowledge-base/knowledge-base.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { KnowledgeBaseModule } from './knowledge-base/knowledge-base.module';
     TenantsModule,
     AgentsModule,
     KnowledgeBaseModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [
