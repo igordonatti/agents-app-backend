@@ -19,7 +19,7 @@ export class AgentsService {
     });
     const tenantExists = await this.prisma.tenants.findFirst({
       where: {
-        id: Number(data.id_tenant),
+        id: data.id_tenant,
       },
     });
 
@@ -34,7 +34,7 @@ export class AgentsService {
         ice_breakers: data.ice_breakers || [],
         tenant: {
           connect: {
-            id: Number(data.id_tenant),
+            id: data.id_tenant,
           },
         },
       },
@@ -44,11 +44,11 @@ export class AgentsService {
 
     return {
       message: 'Agente criado com sucesso',
-      agent: convertBigIntToNumber(agentCreated),
+      agent: agentCreated,
     };
   }
 
-  async deleteAgent(id: number) {
+  async deleteAgent(id: string) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -77,7 +77,7 @@ export class AgentsService {
     return convertBigIntToNumber(agents);
   }
 
-  async getAgentById(id: number) {
+  async getAgentById(id: string) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -89,7 +89,7 @@ export class AgentsService {
     return convertBigIntToNumber(agent);
   }
 
-  async getAgentsByTenant(id_tenant: number) {
+  async getAgentsByTenant(id_tenant: string) {
     const agents = await this.prisma.folders.findMany({
       where: {
         id_tenant,
@@ -99,7 +99,7 @@ export class AgentsService {
     return convertBigIntToNumber(agents);
   }
 
-  async updateAgent(id: number, data: CreateAgentDto) {
+  async updateAgent(id: string, data: CreateAgentDto) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -125,7 +125,7 @@ export class AgentsService {
     };
   }
 
-  async createIceBreaker(data: { text: string; id_agent: number }) {
+  async createIceBreaker(data: { text: string; id_agent: string }) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id: data.id_agent,
@@ -154,7 +154,7 @@ export class AgentsService {
     return convertBigIntToNumber(createdResponse);
   }
 
-  async updateIceBreaker(id: number, index: number, text: string) {
+  async updateIceBreaker(id: string, index: number, text: string) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -185,7 +185,7 @@ export class AgentsService {
     return convertBigIntToNumber(updatedResponse);
   }
 
-  async deleteIceBreaker(id: number, index: number) {
+  async deleteIceBreaker(id: string, index: number) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,
@@ -214,7 +214,7 @@ export class AgentsService {
     return convertBigIntToNumber(deletedResponse);
   }
 
-  async updateCanGenerateImage(id: number, canGenerateImage: boolean) {
+  async updateCanGenerateImage(id: string, canGenerateImage: boolean) {
     const agent = await this.prisma.folders.findUnique({
       where: {
         id,

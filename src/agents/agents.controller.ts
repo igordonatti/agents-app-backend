@@ -122,14 +122,14 @@ export class AgentsController {
   async createIceBreaker(@Body() { text, id_agent }: CreateIceBreakerDto) {
     return await this.agentsService.createIceBreaker({
       text,
-      id_agent: Number(id_agent),
+      id_agent: id_agent,
     });
   }
 
   @ApiUpdateIceBreaker()
   @Patch('ice-breaker/:id/:index')
   async updateIceBreaker(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Param('index', ParseIntPipe) index: number,
     @Body() { text }: UpdateIceBreakerDto,
   ) {
@@ -139,7 +139,7 @@ export class AgentsController {
   @ApiDeleteIceBreaker()
   @Delete('ice-breaker/:id/:index')
   async deleteIceBreaker(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Param('index', ParseIntPipe) index: number,
   ) {
     return await this.agentsService.deleteIceBreaker(id, index);
@@ -233,7 +233,7 @@ export class AgentsController {
     @Body() { canGenerateImage }: { canGenerateImage: boolean },
   ) {
     return await this.agentsService.updateCanGenerateImage(
-      Number(id),
+      id,
       canGenerateImage,
     );
   }
