@@ -34,7 +34,7 @@ export class TenantsService {
     };
   }
 
-  async deleteTenant(id: number) {
+  async deleteTenant(id: string) {
     const tenant = await this.prisma.tenants.findUnique({
       where: {
         id,
@@ -63,7 +63,7 @@ export class TenantsService {
     return tenants;
   }
 
-  async getTenantById(id: number) {
+  async getTenantById(id: string) {
     const tenant = await this.prisma.tenants.findUnique({
       where: {
         id,
@@ -75,7 +75,7 @@ export class TenantsService {
     return tenant;
   }
 
-  async updateTenant(id: number, data: UpdateTenantDto) {
+  async updateTenant(id: string, data: UpdateTenantDto) {
     const tenant = await this.prisma.tenants.findUnique({
       where: {
         id,

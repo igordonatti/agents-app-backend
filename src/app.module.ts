@@ -11,6 +11,7 @@ import { TenantsModule } from './tenants/tenants.module';
 import { AgentsModule } from './agents/agents.module';
 import { KnowledgeBaseModule } from './knowledge-base/knowledge-base.module';
 import { EmailModule } from './email/email.module';
+import { VisualIdentityModule } from './visual-identity/visual-identity.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { EmailModule } from './email/email.module';
     AgentsModule,
     KnowledgeBaseModule,
     EmailModule,
+    VisualIdentityModule,
   ],
   controllers: [AppController],
   providers: [
