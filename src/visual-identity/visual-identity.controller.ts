@@ -50,7 +50,7 @@ export class VisualIdentityController {
       size: file.size,
     }));
 
-    const workflowPath = '/dev/agents/img';
+    const workflowPath = '/agents/img';
 
     console.log('data: ', data.idFolder, data.idAgent);
 
@@ -75,7 +75,7 @@ export class VisualIdentityController {
 
   @Get(':idAgent')
   async getVisualIdentity(@Param('idAgent') idAgent: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/dev/agents/img/${idAgent}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/agents/img/${idAgent}`;
 
     const response = await this.n8nService.getResource(workflowPath);
 

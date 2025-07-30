@@ -27,28 +27,28 @@ export class TenantsController {
   @ApiGetTenants()
   @Get()
   async getTenants() {
-    const workflowPath = 'dev/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiGetTenantById()
   @Get(':id')
   async getTenantsById(@Param('id') id: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/dev/tenants/${id}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/tenants/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiCreateTenant()
   @Post()
   async createTenant(@Body() tenant: CreateTenantDto) {
-    const workflowPath = 'dev/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.postResource(workflowPath, tenant);
   }
 
   @ApiUpdateTenantName()
   @Patch(':id')
   async updateTenantName(@Param('id') id: string, @Body() name: string) {
-    const workflowPath = 'dev/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.patchResource(workflowPath, {
       id_tenant: id,
       name,
@@ -58,7 +58,7 @@ export class TenantsController {
   @ApiDeleteTenant()
   @Delete(':id')
   async deleteTenant(@Param('id') id: string) {
-    const workflowPath = 'dev/tenants';
+    const workflowPath = 'tenants';
     return await this.n8nService.deleteResource(workflowPath, {
       id_folder: id,
     });
