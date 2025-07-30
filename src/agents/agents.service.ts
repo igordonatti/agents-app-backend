@@ -29,7 +29,7 @@ export class AgentsService {
     const agentCreated = await this.prisma.folders.create({
       data: {
         name: data.name,
-        id_folder: data.id_folder,
+        fid_onedrive: data.id_folder,
         prompt: data.prompt || '',
         ice_breakers: data.ice_breakers || [],
         tenant: {

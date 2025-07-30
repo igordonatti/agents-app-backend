@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
   email      String   @unique
   password   String
@@ -20,40 +20,41 @@ model User {
 }
 
 model documents_info {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_original String
   created_at  DateTime @default(now()) @db.Timestamptz(6)
-  folder_id   String
+  folder_id   String   @db.Uuid
   file_name   String?
-  folder      folders  @relation(fields: [folder_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  folder folders @relation(fields: [folder_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
 }
 
 model folders {
-  id                 String   @id @unique @default(cuid())
-  id_folder          String   @unique
-  id_tenant          String
-  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  id                 String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fid_onedrive       String           @unique
+  id_tenant          String           @db.Uuid
+  created_at         DateTime         @default(now()) @db.Timestamptz(6)
   prompt             String?
-  name               String?  @default("")
+  name               String?          @default("")
   ice_breakers       String[]
-  can_generate_image Boolean? @default(true)
+  can_generate_image Boolean?         @default(true)
+  documents_info     documents_info[]
 
-  documents_info  documents_info[]
   tenant          tenants           @relation(fields: [id_tenant], references: [id], onDelete: Cascade)
   visual_identity visual_identity[]
-  Chat            chat[]
 }
 
 model tenants {
-  id          String    @id @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  id_original String    @default("")
-  folders     folders[]
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  id_original String   @default("")
+
+  folders folders[]
 }
 
 model images {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   description String?
   image_id    String?
@@ -62,60 +63,14 @@ model images {
 }
 
 // Arquivos enviados para ser a identidade visual do agente
+
 model visual_identity {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   file_id     String?
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   name        String?
   description String
-  folder_id   String
+  folder_id   String   @db.Uuid
 
   folder folders @relation(fields: [folder_id], references: [id], onDelete: Cascade)
-}
-
-// --- CHAT MODELS ---
-
-enum SenderType {
-  USER
-  AGENT
-}
-
-model endUser {
-  id          String   @id @default(cuid())
-  external_id String?  @unique
-  name        String?
-  email       String?
-  created_at  DateTime @default(now())
-  chats       chat[]
-}
-
-model chat {
-  id         String    @id @default(cuid())
-  title      String?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  folderId   String
-  endUserId  String
-  folder     folders   @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  endUser    endUser   @relation(fields: [endUserId], references: [id], onDelete: Cascade)
-  messages   Message[]
-}
-
-model Message {
-  id          String     @id @default(cuid())
-  content     String     @db.Text
-  sender_type SenderType
-  created_at  DateTime   @default(now())
-  chatId      String
-  chat        chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  image       image?
-}
-
-model image {
-  id          String   @id @default(cuid())
-  url         String
-  description String?
-  created_at  DateTime @default(now())
-  messageId   String   @unique
-  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
