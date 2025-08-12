@@ -9,6 +9,7 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { N8nService } from 'src/n8n/n8n.service';
 
@@ -21,7 +22,14 @@ interface MulterFile {
 
 @Controller('visual-identity')
 export class VisualIdentityController {
-  constructor(private readonly n8nService: N8nService) {}
+  private readonly devOrProd: boolean;
+
+  constructor(
+    private readonly n8nService: N8nService,
+    private readonly configService: ConfigService,
+  ) {
+    this.devOrProd = this.configService.get('DEV_DECIDER');
+  }
 
   @Post()
   @UseInterceptors(
@@ -50,7 +58,7 @@ export class VisualIdentityController {
       size: file.size,
     }));
 
-    const workflowPath = '/agents/img';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}/agents/img`;
 
     console.log('data: ', data.idFolder, data.idAgent);
 
@@ -75,7 +83,7 @@ export class VisualIdentityController {
 
   @Get(':idAgent')
   async getVisualIdentity(@Param('idAgent') idAgent: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/agents/img/${idAgent}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd ? '/dev' : ''}/agents/img/${idAgent}`;
 
     const response = await this.n8nService.getResource(workflowPath);
 

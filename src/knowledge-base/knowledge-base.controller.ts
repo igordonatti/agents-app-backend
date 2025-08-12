@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiTags,
   ApiOperation,
@@ -12,7 +13,14 @@ import { N8nService } from 'src/n8n/n8n.service';
 @ApiBearerAuth('JWT-auth')
 @Controller('knowledge-base')
 export class KnowledgeBaseController {
-  constructor(private readonly n8nService: N8nService) {}
+  private readonly devOrProd: boolean;
+
+  constructor(
+    private readonly n8nService: N8nService,
+    private readonly configService: ConfigService,
+  ) {
+    this.devOrProd = this.configService.get('DEV_DECIDER');
+  }
 
   @ApiOperation({
     summary: 'Atualizar base de conhecimento',
@@ -36,7 +44,7 @@ export class KnowledgeBaseController {
   })
   @Post()
   async updateKnowledgeBase(@Body() folder_id: string) {
-    const workflowPath = 'upload-files';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}upload-files`;
     return await this.n8nService.postResource(workflowPath, folder_id);
   }
 }

@@ -8,65 +8,69 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
   email      String   @unique
   password   String
   created_at DateTime @default(now()) @db.Timestamptz(6)
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 }
 
 model documents_info {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_original String
   created_at  DateTime @default(now()) @db.Timestamptz(6)
-  folder_id   String   @db.Uuid
   file_name   String?
-
-  folder folders @relation(fields: [folder_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  folder_id   String   @db.Uuid
+  folder      folders  @relation(fields: [folder_id], references: [id], onDelete: Cascade, onUpdate: Restrict)
 }
 
 model folders {
-  id                 String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fid_onedrive       String           @unique
-  id_tenant          String           @db.Uuid
-  created_at         DateTime         @default(now()) @db.Timestamptz(6)
+  created_at         DateTime          @default(now()) @db.Timestamptz(6)
   prompt             String?
-  name               String?          @default("")
+  name               String?           @default("")
   ice_breakers       String[]
-  can_generate_image Boolean?         @default(true)
+  can_generate_image Boolean?          @default(true)
+  fid_onedrive       String            @unique
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_tenant          String            @db.Uuid
   documents_info     documents_info[]
-
-  tenant          tenants           @relation(fields: [id_tenant], references: [id], onDelete: Cascade)
-  visual_identity visual_identity[]
+  tenant             tenants           @relation(fields: [id_tenant], references: [id], onDelete: Cascade)
+  visual_identity    visual_identity[]
 }
 
 model tenants {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  id_original String   @default("")
-
-  folders folders[]
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  id_original String    @default("")
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  folders     folders[]
 }
 
 model images {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   description String?
   image_id    String?
   name        String?
   chat_id     String?
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 }
 
-// Arquivos enviados para ser a identidade visual do agente
-
 model visual_identity {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  file_id     String?
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   name        String?
   description String
+  file_id     String?
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   folder_id   String   @db.Uuid
+  folder      folders  @relation(fields: [folder_id], references: [id], onDelete: Cascade)
+}
 
-  folder folders @relation(fields: [folder_id], references: [id], onDelete: Cascade)
+model vectorbase {
+  id         String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content    String?
+  metadata   Json?
+  fid_folder String?                @default(dbgenerated("(metadata ->> 'fid_folder'::text)"))
+  file_name  String?                @default(dbgenerated("(metadata ->> 'file_name'::text)"))
+  doc_id     String?                @default(dbgenerated("(metadata ->> 'doc_id'::text)"))
+  embedding  Unsupported("vector")?
 }

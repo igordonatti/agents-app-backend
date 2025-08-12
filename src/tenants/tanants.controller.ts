@@ -17,38 +17,46 @@ import {
   ApiUpdateTenantName,
   ApiDeleteTenant,
 } from './decorators/api-docs.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Tenants')
 @ApiBearerAuth('JWT-auth')
 @Controller('tenants')
 export class TenantsController {
-  constructor(private readonly n8nService: N8nService) {}
+  private readonly devOrProd: boolean;
+
+  constructor(
+    private readonly n8nService: N8nService,
+    private readonly configService: ConfigService,
+  ) {
+    this.devOrProd = this.configService.get('DEV_DECIDER');
+  }
 
   @ApiGetTenants()
   @Get()
   async getTenants() {
-    const workflowPath = 'tenants';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}tenants`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiGetTenantById()
   @Get(':id')
   async getTenantsById(@Param('id') id: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3/tenants/${id}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd ? '/dev' : ''}/tenants/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiCreateTenant()
   @Post()
   async createTenant(@Body() tenant: CreateTenantDto) {
-    const workflowPath = 'tenants';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}tenants`;
     return await this.n8nService.postResource(workflowPath, tenant);
   }
 
   @ApiUpdateTenantName()
   @Patch(':id')
   async updateTenantName(@Param('id') id: string, @Body() name: string) {
-    const workflowPath = 'tenants';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}tenants`;
     return await this.n8nService.patchResource(workflowPath, {
       id_tenant: id,
       name,
@@ -58,7 +66,7 @@ export class TenantsController {
   @ApiDeleteTenant()
   @Delete(':id')
   async deleteTenant(@Param('id') id: string) {
-    const workflowPath = 'tenants';
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}tenants`;
     return await this.n8nService.deleteResource(workflowPath, {
       id_folder: id,
     });

@@ -3,9 +3,10 @@ import { N8nModule } from 'src/n8n/n8n.module';
 import { TenantsController } from './tanants.controller';
 import { TenantsService } from './tenants.service';
 import { PrismaService } from 'src/databases/prisma.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [N8nModule],
+  imports: [N8nModule, ConfigModule],
   controllers: [TenantsController],
   providers: [TenantsService, PrismaService],
 })
