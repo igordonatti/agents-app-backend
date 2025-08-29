@@ -57,6 +57,7 @@ export class AgentsController {
     private readonly agentsService: AgentsService,
     private readonly configService: ConfigService,
   ) {
+    console.log('configService: ', this.configService.get('DEV_DECIDER'));
     this.devOrProd = this.configService.get('DEV_DECIDER');
   }
 
