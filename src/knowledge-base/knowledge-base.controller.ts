@@ -44,7 +44,7 @@ export class KnowledgeBaseController {
   })
   @Post()
   async updateKnowledgeBase(@Body() folder_id: string) {
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}upload-files`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}upload-files`;
     return await this.n8nService.postResource(workflowPath, folder_id);
   }
 }

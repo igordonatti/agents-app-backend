@@ -13,7 +13,7 @@ export class AgentsElevenlabsService {
     this.devOrProd = this.configService.get('DEV_DECIDER');
   }
   async getTranscriptionsById(id: string) {
-    const workflowPath = `a2bf5357-c174-485b-80b8-7f7abd578422${this.devOrProd ? '/dev' : ''}/transcriptions/elevenlabs/${id}`;
+    const workflowPath = `a2bf5357-c174-485b-80b8-7f7abd578422${this.devOrProd === true ? '/dev' : ''}/transcriptions/elevenlabs/${id}`;
     const data: Transcription[] =
       await this.n8nService.getResource(workflowPath);
 

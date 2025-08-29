@@ -62,43 +62,41 @@ export class AgentsController {
 
   @Get('elevenlabs')
   async getAgentsElevenLabs() {
-    console.log('devOrProd: ', this.devOrProd);
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents/elevenLabs`;
-    console.log('workflowPath: ', workflowPath);
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents/elevenLabs`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @Get('elevenlabs/:id')
   async getAgentElevenlabsById(@Param('id') id: string) {
-    const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd ? '/dev' : ''}/agents/elevenlabs/${id}`;
+    const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd === true ? '/dev' : ''}/agents/elevenlabs/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiGetAgents()
   @Get()
   async getAgents() {
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiGetAgentById()
   @Get(':id')
   async getAgentById(@Param('id') id: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd ? '/dev' : ''}/agents/${id}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd === true ? '/dev' : ''}/agents/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
   @ApiCreateAgent()
   @Post()
   async createAgent(@Body() agent: CreateAgentDto) {
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents`;
     return await this.n8nService.postResource(workflowPath, agent);
   }
 
   @ApiGetAgentsByTenant()
   @Get('tenant/:id_tenant')
   async getAgentsByTenant(@Param('id_tenant') id_tenant: string) {
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd ? '/dev' : ''}/agents/tenant/${id_tenant}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd === true ? '/dev' : ''}/agents/tenant/${id_tenant}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -106,7 +104,7 @@ export class AgentsController {
   @Delete(':id')
   async deleteAgent(@Param('id') id: string) {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents`;
     return await this.n8nService.deleteResource(workflowPath, {
       id_agent: id,
     });
@@ -117,7 +115,7 @@ export class AgentsController {
   async updateAgentPrompt(@Param('id') id: string, @Body() prompt: string) {
     if (!prompt) throw new BadRequestException('Prompt não pode ser vazio');
 
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}upload-prompt`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}upload-prompt`;
     return await this.n8nService.postResource(workflowPath, {
       id_agent: id,
       prompt,
@@ -130,7 +128,7 @@ export class AgentsController {
     if (!id) throw new BadRequestException('Id não pode ser vazio');
     if (!name) throw new BadRequestException('Nome não pode ser vazio');
 
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents`;
     return await this.n8nService.patchResource(workflowPath, {
       id_agent: id,
       name,
@@ -184,7 +182,7 @@ export class AgentsController {
       throw new BadRequestException('ID do agente é obrigatório');
     }
 
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents/doc`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents/doc`;
 
     const fileData = files.map((file) => ({
       buffer: file.buffer,
@@ -219,7 +217,7 @@ export class AgentsController {
       throw new BadRequestException('ID do agente é obrigatório');
     }
 
-    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd ? '/dev' : ''}/agents/file/${id}`;
+    const workflowPath = `4e477042-204e-4a07-aa71-c603d31e1ba3${this.devOrProd === true ? '/dev' : ''}/agents/file/${id}`;
     return await this.n8nService.getResource(workflowPath);
   }
 
@@ -236,7 +234,7 @@ export class AgentsController {
       throw new BadRequestException('ID do arquivo é obrigatório');
     }
 
-    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents/doc`;
+    const workflowPath = `${this.devOrProd === true ? 'dev/' : ''}agents/doc`;
     return await this.n8nService.deleteResource(workflowPath, {
       id_agent: agentId,
       id_file: fileId,

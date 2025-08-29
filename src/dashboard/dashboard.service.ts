@@ -18,7 +18,7 @@ export class DashboardService {
   }
 
   async getDashboardData(id: string) {
-    const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd ? '/dev' : ''}/agents/elevenlabs/${id}`;
+    const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd === true ? '/dev' : ''}/agents/elevenlabs/${id}`;
     const data: AgentsElevenLabs =
       await this.n8nService.getResource(workflowPath);
 
