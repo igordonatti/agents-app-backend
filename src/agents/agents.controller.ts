@@ -64,6 +64,7 @@ export class AgentsController {
   async getAgentsElevenLabs() {
     console.log('devOrProd: ', this.devOrProd);
     const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents/elevenLabs`;
+    console.log('workflowPath: ', workflowPath);
     return await this.n8nService.getResource(workflowPath);
   }
 
