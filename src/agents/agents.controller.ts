@@ -168,7 +168,7 @@ export class AgentsController {
   @ApiUploadFile()
   @Post('upload')
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
+    FilesInterceptor('files', 100, {
       preservePath: true,
     }),
   )

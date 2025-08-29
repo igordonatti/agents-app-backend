@@ -19,7 +19,7 @@ export class FaqService implements OnModuleInit {
 
   async getFaq(id: string) {
     console.log('id: ', id);
-    const chaves = await this.client.keys(`${id}*`);
+    const chaves = await this.client.keys(`${id}`);
     console.log('chaves: ', chaves);
     const cachedFaq = await this.client.get(chaves[0]);
 
