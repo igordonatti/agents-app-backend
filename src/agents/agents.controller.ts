@@ -60,6 +60,18 @@ export class AgentsController {
     this.devOrProd = this.configService.get('DEV_DECIDER');
   }
 
+  @Get('elevenlabs')
+  async getAgentsElevenLabs() {
+    const workflowPath = `${this.devOrProd ? 'dev/' : ''}agents/elevenLabs`;
+    return await this.n8nService.getResource(workflowPath);
+  }
+
+  @Get('elevenlabs/:id')
+  async getAgentElevenlabsById(@Param('id') id: string) {
+    const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd ? '/dev' : ''}/agents/elevenlabs/${id}`;
+    return await this.n8nService.getResource(workflowPath);
+  }
+
   @ApiGetAgents()
   @Get()
   async getAgents() {

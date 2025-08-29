@@ -111,6 +111,7 @@ export class N8nService {
           .pipe(map((axiosResponse) => axiosResponse.data)), // Extrai apenas o corpo da resposta
       );
       this.logger.log(`Dados recebidos com sucesso de ${workflowPath}`);
+      // this.logger.log(`Dados recebidos: ${JSON.stringify(response, null, 2)}`);
       return response as T;
     } catch (error) {
       if (error instanceof AxiosError) {

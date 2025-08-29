@@ -12,6 +12,11 @@ import { AgentsModule } from './agents/agents.module';
 import { KnowledgeBaseModule } from './knowledge-base/knowledge-base.module';
 import { EmailModule } from './email/email.module';
 import { VisualIdentityModule } from './visual-identity/visual-identity.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AgentsElevenlabsModule } from './agents-elevenlabs/agents-elevenlabs.module';
+// import { CacheModule } from '@nestjs/cache-manager';
+// import { redisStore } from 'cache-manager-redis-store';
+import { FaqModule } from './faq/faq.module';
 
 @Module({
   imports: [
@@ -19,6 +24,7 @@ import { VisualIdentityModule } from './visual-identity/visual-identity.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+
     UserModule,
     AuthModule,
     N8nModule,
@@ -27,6 +33,9 @@ import { VisualIdentityModule } from './visual-identity/visual-identity.module';
     KnowledgeBaseModule,
     EmailModule,
     VisualIdentityModule,
+    DashboardModule,
+    AgentsElevenlabsModule,
+    FaqModule,
   ],
   controllers: [AppController],
   providers: [
