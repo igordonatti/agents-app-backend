@@ -168,9 +168,6 @@ export class AgentsController {
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       preservePath: true,
-      limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB
-      },
     }),
   )
   async uploadFile(
