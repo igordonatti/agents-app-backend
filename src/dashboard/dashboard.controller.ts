@@ -1,6 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DashboardService } from './dashboard.service';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 // import { N8nService } from 'src/n8n/n8n.service';
 
 @Controller('dashboard')
@@ -16,6 +17,7 @@ export class DashboardController {
   }
 
   @Get(':id')
+  @isPublic()
   async getDataDashboardByID(@Param('id') id: string) {
     return await this.dashboardService.getDashboardData(id);
   }
