@@ -38,6 +38,7 @@ import {
   ApiUpdateCanGenerateImage,
 } from './decorators/api-docs.decorator';
 import { ConfigService } from '@nestjs/config';
+import { isPublic } from 'src/auth/decorators/is-public.decorator';
 
 interface MulterFile {
   buffer: Buffer;
@@ -67,6 +68,7 @@ export class AgentsController {
   }
 
   @Get('elevenlabs/:id')
+  @isPublic()
   async getAgentElevenlabsById(@Param('id') id: string) {
     const workflowPath = `58bc66e5-606d-44e7-be6b-1278a97c9ec2${this.devOrProd === true ? '/dev' : ''}/agents/elevenlabs/${id}`;
     return await this.n8nService.getResource(workflowPath);
